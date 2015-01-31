@@ -1,0 +1,33 @@
+# general
+
+# linux
+*~
+
+# Eclipse
+.settings
+.cache
+.project
+.classpath
+
+# IDEA
+.idea
+.idea_modules
+*.iml
+
+# SBT
+dist/
+project/project/
+project/target/
+target/
+
+# Play
+logs/
+RUNNING_PID
+activator
+activator.bat
+activator-launch-1.2.12.jar
+
+
+tmp
+.history
+/out
