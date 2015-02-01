@@ -3,7 +3,16 @@
 # ~~~~
 
 # Home page
-GET     /                           controllers.Application.index
+GET    /                     controllers.Application.home
+
+GET    /tasks                controllers.Tasks.list(p: Int ?= 1)
+GET    /tasks/all            controllers.Tasks.listAll
+GET    /tasks/create         controllers.Tasks.create
+POST   /tasks                controllers.Tasks.save
+GET    /tasks/:uuid          controllers.Tasks.details(uuid: String)
+GET    /tasks/:uuid/edit     controllers.Tasks.edit(uuid: String)
+POST   /tasks/:uuid          controllers.Tasks.update(uuid: String)
+POST   /tasks/:uuid/delete   controllers.Tasks.delete(uuid: String)
 
 # Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file               controllers.Assets.at(path="/public", file)
+GET    /assets/*file         controllers.Assets.at(path="/public", file)

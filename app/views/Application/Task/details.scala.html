@@ -1,0 +1,8 @@
+@(task: domain.models.Task)(implicit lang: Lang, flash: Flash, req: RequestHeader)
+
+@template("Task "+task.title) {
+  <div>
+    @helpers.flash()
+    @partials.fullItem(task)
+  </div>
+}

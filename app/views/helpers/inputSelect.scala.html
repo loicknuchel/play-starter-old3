@@ -1,0 +1,13 @@
+@(field: Field, options: Seq[(String, String)], args: (Symbol, String)*)
+
+@import views.html.helpers.FormHelpers
+
+<select class="form-control @FormHelpers.getArg(args, "class")" id="@field.id" name="@field.name"
+  @FormHelpers.toHtmlArgs(args, Seq("class", "emptyOption"))
+  @if(FormHelpers.isRequired(field)){required}>
+  
+  @if(FormHelpers.getArg(args, "emptyOption").length > 0){ <option class="blank" value="">@FormHelpers.getArg(args, "emptyOption")</option> }
+  @for((value, label) <- options) {
+    <option value="@value" @if(field.value == Some(value)) {selected}>@label</option>
+  }
+</select>

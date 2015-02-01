@@ -1,0 +1,13 @@
+@(taskPage: common.models.Page[domain.models.Task])(implicit lang: Lang, flash: Flash, req: RequestHeader)
+
+@template("Tasks") {
+  <div>
+    @helpers.flash()
+    <a class="btn btn-default pull-right" href="@routes.Tasks.create()"><i class="fa fa-plus"></i> Créer</a>
+    <h1>@taskPage.items.length task@if(taskPage.items.length > 1) {s}</h1>
+    @taskPage.items.map { task =>
+      @partials.listItem(task)
+    }
+    @helpers.pagination(taskPage, (p: Int) => routes.Tasks.list(p))
+  </div>
+}

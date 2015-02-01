@@ -1,0 +1,7 @@
+@(taskForm: Form[domain.models.TaskData])
+
+@import helpers._
+
+@fieldHorizontal(taskForm("title"), 'label -> "Titre"){field => @inputText(field)}
+@fieldHorizontal(taskForm("description"), 'label -> "Description"){field => @inputTextarea(field)}
+@fieldHorizontal(taskForm("done"), 'label -> "Terminée"){field => @inputCheckbox(field)}

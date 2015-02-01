@@ -1,0 +1,17 @@
+@(taskForm: Form[domain.models.TaskData])(implicit lang: Lang, flash: Flash, req: RequestHeader)
+
+@template("Create task") {
+  <div>
+    @helpers.flash()
+    <h1>Create task</h1>
+    <form class="form-horizontal" method="POST" action="@routes.Tasks.save()">
+      @partials.form(taskForm)
+      <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+          <a href="@routes.Tasks.list()" class="btn btn-default">Annuler</a>
+          <button type="submit" class="btn btn-primary">Créer</button>
+        </div>
+      </div>
+    </form>
+  </div>
+}

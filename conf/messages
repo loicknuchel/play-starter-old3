@@ -1,0 +1,8 @@
+# Messages de play
+# --- Constraints
+constraint.required=Obligatoire
+constraint.min=Valeur minimum : {0}
+constraint.max=Valeur max. : {0}
+constraint.minLength=Longeur minimum : {0}
+constraint.maxLength=Longeur max: {0}
+constraint.email=Adresse email

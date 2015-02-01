@@ -1,0 +1,16 @@
+@(task: domain.models.Task)
+
+<div class="media">
+  <div class="media-left">
+    <img class="media-object" src="http://lorempixel.com/64/64/?a=@task.uuid">
+  </div>
+  <div class="media-body">
+    <div class="pull-right">
+      <a class="btn btn-default" href="@routes.Tasks.details(task.uuid)">Voir</a>
+      <a class="btn btn-info" href="@routes.Tasks.edit(task.uuid)">Modifier</a>
+      <form class="form-button" method="POST" action="@routes.Tasks.delete(task.uuid)"><button type="submit" class="btn btn-danger">Supprimer</button></form>
+    </div>
+    <h4 class="media-heading">@task.title</h4>
+    <p>@task.description</p>
+  </div>
+</div>

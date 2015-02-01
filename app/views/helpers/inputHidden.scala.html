@@ -1,0 +1,10 @@
+@(field: Field, args: (Symbol, String)*)
+
+@import views.html.helpers.FormHelpers
+
+<input 
+  type="hidden" 
+  name="@field.name" 
+  id="@field.id" 
+  value="@FormHelpers.getArg(args, "value", field.value.getOrElse(""))"
+  @FormHelpers.toHtmlArgs(args, Seq("value"))>

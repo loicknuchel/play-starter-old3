@@ -1,0 +1,12 @@
+@(tasks: List[domain.models.Task])(implicit lang: Lang, flash: Flash, req: RequestHeader)
+
+@template("Tasks") {
+  <div>
+    @helpers.flash()
+    <a class="btn btn-default pull-right" href="@routes.Tasks.create()"><i class="fa fa-plus"></i> Créer</a>
+    <h1>@tasks.length task@if(tasks.length > 1) {s}</h1>
+    @tasks.map { task =>
+      @partials.listItem(task)
+    }
+  </div>
+}
