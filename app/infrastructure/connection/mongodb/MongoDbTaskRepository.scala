@@ -3,7 +3,6 @@ package infrastructure.connection.mongodb
 import common.models.Page
 import domain.models.Task
 import domain.repository.{ UUID, TaskRepository }
-import infrastructure.binding.json.TaskFormat._
 import scala.concurrent.Future
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.Json

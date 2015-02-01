@@ -3,16 +3,23 @@
 # ~~~~
 
 # Home page
-GET    /                     controllers.Application.home
+GET      /                     controllers.Application.home
 
-GET    /tasks                controllers.Tasks.list(p: Int ?= 1)
-GET    /tasks/all            controllers.Tasks.listAll
-GET    /tasks/create         controllers.Tasks.create
-POST   /tasks                controllers.Tasks.save
-GET    /tasks/:uuid          controllers.Tasks.details(uuid: String)
-GET    /tasks/:uuid/edit     controllers.Tasks.edit(uuid: String)
-POST   /tasks/:uuid          controllers.Tasks.update(uuid: String)
-POST   /tasks/:uuid/delete   controllers.Tasks.delete(uuid: String)
+GET      /tasks                controllers.Tasks.list(p: Int ?= 1)
+GET      /tasks/all            controllers.Tasks.listAll
+GET      /tasks/create         controllers.Tasks.create
+POST     /tasks                controllers.Tasks.save
+GET      /tasks/:uuid          controllers.Tasks.details(uuid: String)
+GET      /tasks/:uuid/edit     controllers.Tasks.edit(uuid: String)
+POST     /tasks/:uuid          controllers.Tasks.update(uuid: String)
+POST     /tasks/:uuid/delete   controllers.Tasks.delete(uuid: String)
+
+GET      /api/v1/tasks         controllers.Tasks.apiList(p: Int ?= 1)
+GET      /api/v1/tasks/all     controllers.Tasks.apiListAll
+POST     /api/v1/tasks         controllers.Tasks.apiCreate
+GET      /api/v1/tasks/:uuid   controllers.Tasks.apiDetails(uuid: String)
+PUT      /api/v1/tasks/:uuid   controllers.Tasks.apiUpdate(uuid: String)
+DELETE   /api/v1/tasks/:uuid   controllers.Tasks.apiDelete(uuid: String)
 
 # Map static resources from the /public folder to the /assets URL path
-GET    /assets/*file         controllers.Assets.at(path="/public", file)
+GET      /assets/*file         controllers.Assets.at(path="/public", file)
