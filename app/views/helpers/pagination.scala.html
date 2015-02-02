@@ -1,7 +1,7 @@
 @*
  *  Sample use: @helpers.pagination(taskPage, (p: Int) => routes.Tasks.list(p))
  *@
-@(page: common.models.Page[_], link: Int => play.api.mvc.Call)
+@(page: common.models.Page[_], link: Int => play.api.mvc.Call, range: Int = 2)
 
 <div>
   @if(page.totalItems == 0){ <p>Aucun élément ne correspond à ces critères de recherche.</p> }
@@ -11,43 +11,41 @@
   @if(page.totalItems > page.pageSize) {
     <nav>
       <ul class="pagination">
-        @defining(2) { range =>
-          @if(page.prev.isDefined) {
-            <li><a href="@link(page.prev.get)")">&laquo;</a></li>
-          } else {
-            <li class="disabled"><span>&laquo;</span</li>
-          }
-          
-          @if(page.currentPage-range > 1){
-            <li><a href="@link(1)">1</a></li>
-          }
-          @if(page.currentPage-range > 2){
-            <li class="disabled"><span>...</span</li>
-          }
-           
-          @for(i <-page.currentPage-range until page.currentPage+range+1){
-            @if(0 < i && i <= page.totalPages){
-              @if(i == page.currentPage){
-                <li class="active"><span>@i <span class="sr-only">(current)</span></span></li>
-              } else {
-                <li><a href="@link(i)">@i</a></li>
-              }
+        @if(page.prev.isDefined) {
+          <li><a href="@link(page.prev.get)")">&laquo;</a></li>
+        } else {
+          <li class="disabled"><span>&laquo;</span</li>
+        }
+
+        @if(page.currentPage-range > 1){
+          <li><a href="@link(1)">1</a></li>
+        }
+        @if(page.currentPage-range > 2){
+          <li class="disabled"><span>...</span</li>
+        }
+
+        @for(i <-page.currentPage-range until page.currentPage+range+1){
+          @if(0 < i && i <= page.totalPages){
+            @if(i == page.currentPage){
+              <li class="active"><span>@i <span class="sr-only">(current)</span></span></li>
+            } else {
+              <li><a href="@link(i)">@i</a></li>
             }
           }
-          
-          @if(page.currentPage+range+1 < page.totalPages){
-            <li class="disabled"><span>...</span</li>
-          }
-          @if(page.currentPage+range < page.totalPages){
-            <li><a href="@link(page.totalPages)">@{page.totalPages}</a></li>
-          }
-            
-          @if(page.next.isDefined) {
-            <li><a href="@link(page.next.get)">&raquo;</a></li>
-          } else {
-            <li class="disabled"><span>&raquo;</span></li>
-          }
         }
+
+        @if(page.currentPage+range+1 < page.totalPages){
+          <li class="disabled"><span>...</span</li>
+        }
+        @if(page.currentPage+range < page.totalPages){
+          <li><a href="@link(page.totalPages)">@{page.totalPages}</a></li>
+        }
+          
+        @if(page.next.isDefined) {
+          <li><a href="@link(page.next.get)">&raquo;</a></li>
+        } else {
+          <li class="disabled"><span>&raquo;</span></li>
+          }
       </ul>
     </nav>
   }
