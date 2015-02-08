@@ -8,7 +8,9 @@ case class Task(
   uuid: UUID,
   title: String,
   description: String,
-  done: Boolean)
+  done: Boolean) {
+  def withUuid(uuid: String) = this.copy(uuid = uuid)
+}
 object Task {
   implicit val format = Json.format[Task]
 }

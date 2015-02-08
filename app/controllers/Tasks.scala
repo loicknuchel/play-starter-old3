@@ -11,7 +11,7 @@ import play.api.libs.json._
 
 object Tasks extends Controller {
   val form: Form[TaskData] = Form(TaskData.fields)
-  val repository: Repository[Task, MonadicResult] = TaskRepository
+  val repository: Repository[Task] = TaskRepository
   val mainRoute = routes.Tasks
   val viewList = views.html.Application.Task.list
   val viewListAll = views.html.Application.Task.listAll

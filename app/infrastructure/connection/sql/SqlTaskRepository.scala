@@ -10,7 +10,7 @@ import domain.models.Task
 import anorm._
 import anorm.SqlParser._
 
-trait SqlTaskRepository extends Repository[Task, MonadicResult] {
+trait SqlTaskRepository extends Repository[Task] {
   private val tableName = "Tasks"
 
   private val rowParser = {
@@ -36,7 +36,7 @@ trait SqlTaskRepository extends Repository[Task, MonadicResult] {
   override def findAll(): MonadicResult[List[Task]] = SyncResult(crud.findAll())
   override def findPage(page: Int): MonadicResult[Page[Task]] = SyncResult(crud.findPage(page, orderBy = Some("title")))
   override def findByUuid(uuid: UUID): MonadicResult[Option[Task]] = SyncResult(crud.findById(uuid))
-  override def insert(elt: Task): MonadicResult[Option[Task]] = SyncResult(crud.insert(elt).map(s => elt))
+  override def insert(elt: Task): MonadicResult[Option[Task]] = SyncResult(crud.insert(elt.withUuid(generateUuid())).map(s => elt))
   override def update(uuid: UUID, elt: Task): MonadicResult[Option[Task]] = { crud.update(uuid, elt); SyncResult(Some(elt)) }
   override def delete(uuid: UUID): MonadicResult[Option[Task]] = { crud.delete(uuid); SyncResult(None); }
 }
