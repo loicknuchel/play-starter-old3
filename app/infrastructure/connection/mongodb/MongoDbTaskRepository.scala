@@ -6,6 +6,7 @@ import common.models.MonadicResult
 import common.models.AsyncResult
 import common.models.Repository
 import domain.models.Task
+import common.infrastructure.MongoDbCrudUtils
 import scala.concurrent.Future
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.Json
@@ -15,10 +16,12 @@ import play.modules.reactivemongo.json.collection.JSONCollection
 trait MongoDbTaskRepository extends Repository[Task] with Connection {
   override lazy val collection: JSONCollection = db[JSONCollection](CollectionReferences.TASKS)
 
-  override def findAll(): MonadicResult[List[Task]] = AsyncResult(collection.find(Json.obj()).cursor[Task].collect[List]())
-  override def findPage(page: Int): MonadicResult[Page[Task]] = AsyncResult(Page(List[Task](), 0, 0, 0)) // TODO
-  override def findByUuid(uuid: UUID): MonadicResult[Option[Task]] = AsyncResult(collection.find(Json.obj("uuid" -> uuid)).cursor[Task].headOption)
-  override def insert(elt: Task): MonadicResult[Option[Task]] = AsyncResult(collection.save(elt.withUuid(generateUuid())).map { lastError => if (lastError.ok) Some(elt.withUuid(generateUuid())) else None })
-  override def update(uuid: UUID, elt: Task): MonadicResult[Option[Task]] = AsyncResult(collection.update(Json.obj("uuid" -> uuid), elt).map { lastError => if (lastError.updated == 1) Some(elt) else None })
-  override def delete(uuid: UUID): MonadicResult[Option[Task]] = AsyncResult(None) // TODO
+  private val crud = MongoDbCrudUtils(collection, Task.format, List("title", "description"), "uuid")
+
+  override def findAll(filter: String = "", orderBy: String = ""): MonadicResult[List[Task]] = AsyncResult(crud.findAll(filter, orderBy))
+  override def findPage(page: Int = 1, filter: String = "", orderBy: String = ""): MonadicResult[Page[Task]] = AsyncResult(crud.findPage(page, filter, orderBy))
+  override def findByUuid(uuid: UUID): MonadicResult[Option[Task]] = AsyncResult(crud.findByUuid(uuid))
+  override def insert(elt: Task): MonadicResult[Option[Task]] = AsyncResult({ val eltWithId = elt.withUuid(generateUuid()); crud.insert(eltWithId).map(err => if (err.ok) Some(eltWithId) else None) })
+  override def update(uuid: UUID, elt: Task): MonadicResult[Option[Task]] = AsyncResult(crud.update(uuid, elt).map(err => if (err.ok) Some(elt) else None))
+  override def delete(uuid: UUID): MonadicResult[Option[Task]] = AsyncResult(crud.delete(uuid).map(err => None)) // TODO : return deleted elt !
 }

@@ -27,17 +27,17 @@ object Tasks extends Controller {
   def errorUpdateFlash(elt: Task) = s"Task '${elt.title}' can't be modified"
   def successDeleteFlash(elt: Task) = s"Task '${elt.title}' has been deleted"
 
-  def list(p: Int) = Action.async { implicit req =>
-    repository.findPage(p).map { page =>
-      if (page.totalPages < p)
-        Redirect(mainRoute.list(page.totalPages))
+  def list(p: Int = 1, f: String = "", o: String = "") = Action.async { implicit req =>
+    repository.findPage(p, f, o).map { page =>
+      if (p > 1 && page.totalPages < p)
+        Redirect(mainRoute.list(page.totalPages, f, o))
       else
         Ok(viewList(page))
     }.get
   }
 
-  def listAll = Action.async { implicit req =>
-    repository.findAll().map { all => Ok(viewListAll(all)) }.get
+  def listAll(f: String = "", o: String = "") = Action.async { implicit req =>
+    repository.findAll(f, o).map { all => Ok(viewListAll(all)) }.get
   }
 
   def create = Action { implicit req =>
@@ -93,13 +93,13 @@ object Tasks extends Controller {
     }.get
   }
 
-  def apiList(p: Int) = Action.async {
-    repository.findPage(p).map { page =>
+  def apiList(p: Int = 1, f: String = "", o: String = "") = Action.async {
+    repository.findPage(p, f, o).map { page =>
       Ok(Json.toJson(page))
     }.get
   }
-  def apiListAll = Action.async {
-    repository.findAll().map { all =>
+  def apiListAll(f: String = "", o: String = "") = Action.async {
+    repository.findAll(f, o).map { all =>
       Ok(Json.toJson(all))
     }.get
   }

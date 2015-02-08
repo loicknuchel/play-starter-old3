@@ -11,7 +11,7 @@ import anorm._
 import anorm.SqlParser._
 
 trait SqlTaskRepository extends Repository[Task] {
-  private val tableName = "Tasks"
+  private val tableName = TableReferences.TASKS
 
   private val rowParser = {
     get[String](s"$tableName.uuid") ~
@@ -31,12 +31,12 @@ trait SqlTaskRepository extends Repository[Task] {
       ("done", task.map(_.done)))
   }
 
-  private val crud = SqlCrudUtils(tableName, toValues, rowParser, "uuid")
+  private val crud = SqlCrudUtils(tableName, toValues, rowParser, List("title", "description"), "uuid")
 
-  override def findAll(): MonadicResult[List[Task]] = SyncResult(crud.findAll())
-  override def findPage(page: Int): MonadicResult[Page[Task]] = SyncResult(crud.findPage(page, orderBy = Some("title")))
-  override def findByUuid(uuid: UUID): MonadicResult[Option[Task]] = SyncResult(crud.findById(uuid))
-  override def insert(elt: Task): MonadicResult[Option[Task]] = SyncResult(crud.insert(elt.withUuid(generateUuid())).map(s => elt))
-  override def update(uuid: UUID, elt: Task): MonadicResult[Option[Task]] = { crud.update(uuid, elt); SyncResult(Some(elt)) }
-  override def delete(uuid: UUID): MonadicResult[Option[Task]] = { crud.delete(uuid); SyncResult(None); }
+  override def findAll(filter: String = "", orderBy: String = ""): MonadicResult[List[Task]] = SyncResult(crud.findAll(filter, orderBy))
+  override def findPage(page: Int = 1, filter: String = "", orderBy: String = ""): MonadicResult[Page[Task]] = SyncResult(crud.findPage(page, filter, orderBy))
+  override def findByUuid(uuid: UUID): MonadicResult[Option[Task]] = SyncResult(crud.findByUuid(uuid))
+  override def insert(elt: Task): MonadicResult[Option[Task]] = SyncResult({ val eltWithId = elt.withUuid(generateUuid()); crud.insert(eltWithId).map(s => eltWithId) })
+  override def update(uuid: UUID, elt: Task): MonadicResult[Option[Task]] = SyncResult({ crud.update(uuid, elt); Some(elt) })
+  override def delete(uuid: UUID): MonadicResult[Option[Task]] = SyncResult({ crud.delete(uuid); None }) // TODO : return deleted elt !
 }

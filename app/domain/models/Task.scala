@@ -9,6 +9,7 @@ case class Task(
   title: String,
   description: String,
   done: Boolean) {
+  // TODO : add created, updated, createdBy, updatedBy fields
   def withUuid(uuid: String) = this.copy(uuid = uuid)
 }
 object Task {
