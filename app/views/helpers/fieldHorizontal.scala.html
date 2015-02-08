@@ -1,9 +1,9 @@
 @(field: Field, args: (Symbol, String)*)(input: Field => Html)
 
-@import views.html.helpers.FormHelpers
+@import views.html.helpers._
 
-<div class="form-group @FormHelpers.getArg(args, "class") @if(field.hasErrors){has-error}">
-  <label for="@field.id" class="control-label col-sm-2">@FormHelpers.getArg(args, "label", field.name)</label>
+<div class="form-group @Helpers.getArg(args, "class") @if(field.hasErrors){has-error}">
+  <label for="@field.id" class="control-label col-sm-2">@Helpers.getArg(args, "label", field.name)</label>
   <div class="col-sm-10">
     @input(field)
     @if(field.hasErrors && field.errors.length > 0){

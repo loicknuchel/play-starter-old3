@@ -1,12 +1,12 @@
 @(field: Field, args: (Symbol, String)*)
 
-@import views.html.helpers.FormHelpers
+@import views.html.helpers._
 
-<input 
-  type="checkbox" 
-  name="@field.name" 
-  id="@field.id" 
-  value="true" 
-  @FormHelpers.toHtmlArgs(args) 
-  @if(FormHelpers.isRequired(field)){required} 
+<input
+  type="checkbox"
+  name="@field.name"
+  id="@field.id"
+  value="true"
+  @Helpers.toHtmlArgs(args)
+  @if(Helpers.isRequired(field)){required}
   @if(field.value == Some("true")) {checked}>

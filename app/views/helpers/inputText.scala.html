@@ -1,12 +1,12 @@
 @(field: Field, args: (Symbol, String)*)
 
-@import views.html.helpers.FormHelpers
+@import views.html.helpers._
 
-<input 
-  type="@FormHelpers.getArg(args, "type", "text")" 
-  class="form-control @FormHelpers.getArg(args, "class")" 
-  name="@field.name" 
-  id="@field.id" 
-  value="@field.value" 
-  @FormHelpers.toHtmlArgs(args, Seq("type", "class")) 
-  @if(FormHelpers.isRequired(field)){required}>
+<input
+  type="@Helpers.getArg(args, "type", "text")"
+  class="form-control @Helpers.getArg(args, "class")"
+  name="@field.name"
+  id="@field.id"
+  value="@field.value"
+  @Helpers.toHtmlArgs(args, Seq("type", "class"))
+  @if(Helpers.isRequired(field)){required}>

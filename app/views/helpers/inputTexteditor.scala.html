@@ -2,8 +2,9 @@
 
 @import views.html.helpers._
 
+@* see http://bootstrap-wysiwyg.github.io/bootstrap3-wysiwyg/ *@
 <textarea
-  class="form-control @Helpers.getArg(args, "class")"
+  class="wysihtml5 form-control @Helpers.getArg(args, "class")"
   name="@field.name"
   id="@field.id"
   @Helpers.toHtmlArgs(args, Seq("class"))
