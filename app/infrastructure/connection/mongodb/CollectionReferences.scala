@@ -1,5 +1,5 @@
 package infrastructure.connection.mongodb
 
-object CollectionReference {
+object CollectionReferences {
   val TASKS = "Tasks"
 }

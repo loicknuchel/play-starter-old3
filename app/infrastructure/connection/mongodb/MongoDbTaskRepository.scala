@@ -13,7 +13,7 @@ import scalaz._
 import Scalaz._
 
 trait MongoDbTaskRepository extends TaskRepository[Future] with Connection {
-  override lazy val collection: JSONCollection = db[JSONCollection](CollectionReference.TASKS)
+  override lazy val collection: JSONCollection = db[JSONCollection](CollectionReferences.TASKS)
 
   override def findAll: Future[List[Task]] = collection.find(Json.obj()).cursor[Task].collect[List]()
   override def findPage: Int => Future[Page[Task]] = page => Future.successful(Page(List(), 0, 0, 0)) // TODO

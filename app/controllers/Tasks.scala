@@ -4,98 +4,115 @@ import common.models.Page
 import domain.models.Task
 import domain.models.TaskData
 import domain.repository.TaskRepository
+import domain.services.TaskSrv
 import play.api.mvc._
 import play.api.data.Form
 import play.api.libs.json.Json
 
 object Tasks extends Controller {
-  val taskForm = Form(TaskData.fields)
+  val form: Form[TaskData] = Form(TaskData.fields)
+  val EltData = TaskData
+  val repository = TaskRepository
+  val srv = TaskSrv
+  val mainRoute = routes.Tasks
+  val viewList = views.html.Application.Task.list
+  val viewListAll = views.html.Application.Task.listAll
+  val viewCreate = views.html.Application.Task.create
+  val viewDetails = views.html.Application.Task.details
+  val viewEdit = views.html.Application.Task.edit
+  def successCreateFlash(elt: Task) = s"Task '${elt.title}' has been created"
+  def errorCreateFlash(elt: TaskData) = s"Task '${elt.title}' can't be created"
+  def successUpdateFlash(elt: Task) = s"Task '${elt.title}' has been modified"
+  def errorUpdateFlash(elt: Task) = s"Task '${elt.title}' can't be modified"
+  def successDeleteFlash(elt: Task) = s"Task '${elt.title}' has been deleted"
 
   def list(p: Int) = Action { implicit req =>
-    val page = TaskRepository.findPage(p)
+    val page = repository.findPage(p)
     if (page.totalPages < p)
-      Redirect(routes.Tasks.list(page.totalPages))
+      Redirect(mainRoute.list(page.totalPages))
     else
-      Ok(views.html.Application.Task.list(page))
+      Ok(viewList(page))
   }
 
   def listAll = Action { implicit req =>
-    Ok(views.html.Application.Task.listAll(TaskRepository.findAll()))
+    Ok(viewListAll(repository.findAll()))
   }
 
   def create = Action { implicit req =>
-    Ok(views.html.Application.Task.create(taskForm))
+    Ok(viewCreate(form))
   }
 
   def save = Action { implicit req =>
-    taskForm.bindFromRequest.fold(
-      formWithErrors => BadRequest(views.html.Application.Task.create(formWithErrors)),
+    form.bindFromRequest.fold(
+      formWithErrors => BadRequest(viewCreate(formWithErrors)),
       formData => {
-        TaskRepository.insert(Task.fromData(formData))
-        Redirect(routes.Tasks.list()).flashing("success" -> s"Task '${formData.title}' has been created")
+        srv.create(formData).map { elt =>
+          Redirect(mainRoute.list()).flashing("success" -> successCreateFlash(elt))
+        }.getOrElse(InternalServerError(viewCreate(form.fill(formData))).flashing("error" -> errorCreateFlash(formData)))
       })
   }
 
   def details(uuid: String) = Action { implicit req =>
-    TaskRepository.findById(uuid).map { task =>
-      Ok(views.html.Application.Task.details(task))
+    repository.findById(uuid).map { elt =>
+      Ok(viewDetails(elt))
     }.getOrElse(NotFound(views.html.error404()))
   }
 
   def edit(uuid: String) = Action { implicit req =>
-    TaskRepository.findById(uuid).map { task =>
-      Ok(views.html.Application.Task.edit(taskForm.fill(Task.toData(task)), task))
+    repository.findById(uuid).map { elt =>
+      Ok(viewEdit(form.fill(EltData.fromModel(elt)), elt))
     }.getOrElse(NotFound(views.html.error404()))
   }
 
   def update(uuid: String) = Action { implicit req =>
-    TaskRepository.findById(uuid).map { task =>
-      taskForm.bindFromRequest.fold(
-        formWithErrors => BadRequest(views.html.Application.Task.edit(formWithErrors, task)),
+    repository.findById(uuid).map { elt =>
+      form.bindFromRequest.fold(
+        formWithErrors => BadRequest(viewEdit(formWithErrors, elt)),
         formData => {
-          TaskRepository.update(uuid, Task.fromData(formData))
-          Redirect(routes.Tasks.list()).flashing("success" -> s"Task '${formData.title}' has been modified")
+          srv.update(uuid, formData).map { updatedElt =>
+            Redirect(mainRoute.list()).flashing("success" -> successUpdateFlash(updatedElt))
+          }.getOrElse(InternalServerError(viewEdit(form.fill(formData), elt)).flashing("error" -> errorUpdateFlash(elt)))
         })
     }.getOrElse(NotFound(views.html.error404()))
   }
 
   def delete(uuid: String) = Action { implicit req =>
-    TaskRepository.findById(uuid).map { task =>
-      TaskRepository.delete(uuid)
-      Redirect(routes.Tasks.list()).flashing("success" -> s"Task '${task.title}' has been deleted")
+    repository.findById(uuid).map { elt =>
+      repository.delete(uuid)
+      Redirect(mainRoute.list()).flashing("success" -> successDeleteFlash(elt))
     }.getOrElse(NotFound(views.html.error404()))
   }
 
   def apiList(p: Int) = Action {
-    Ok // TODO : serialize Page[A] to json...
+    Ok(Json.toJson(repository.findPage(p)))
   }
   def apiListAll = Action {
-    Ok(Json.toJson(TaskRepository.findAll()))
+    Ok(Json.toJson(repository.findAll()))
   }
   def apiCreate = Action(parse.json) { req =>
     req.body.validate[TaskData].map { formData =>
-      val task = Task.fromData(formData)
-      TaskRepository.insert(task)
-      Ok(Json.toJson(task))
+      srv.create(formData).map { elt =>
+        Ok(Json.toJson(elt))
+      }.getOrElse(InternalServerError)
     }.getOrElse(BadRequest)
   }
   def apiDetails(uuid: String) = Action {
-    TaskRepository.findById(uuid).map { task =>
-      Ok(Json.toJson(task))
+    repository.findById(uuid).map { elt =>
+      Ok(Json.obj("item" -> elt))
     }.getOrElse(NotFound)
   }
   def apiUpdate(uuid: String) = Action(parse.json) { req =>
-    TaskRepository.findById(uuid).map { task =>
+    repository.findById(uuid).map { elt =>
       req.body.validate[TaskData].map { formData =>
-        TaskRepository.update(uuid, Task.fromData(formData)).map { task =>
-          Ok(Json.toJson(task))
+        repository.update(uuid, EltData.toModel(formData)).map { updatedElt =>
+          Ok(Json.obj("item" -> updatedElt))
         }.getOrElse(InternalServerError)
       }.getOrElse(BadRequest)
     }.getOrElse(NotFound)
   }
   def apiDelete(uuid: String) = Action {
-    TaskRepository.findById(uuid).map { task =>
-      TaskRepository.delete(uuid)
+    repository.findById(uuid).map { elt =>
+      repository.delete(uuid)
       Ok
     }.getOrElse(NotFound)
   }

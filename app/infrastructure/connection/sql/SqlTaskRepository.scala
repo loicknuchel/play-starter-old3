@@ -44,7 +44,7 @@ trait SqlTaskRepository extends TaskRepository[SyncResult] {
   def delete(uid: String): Int = crud.delete(uid)
   */
 
-  def findAll(): List[Task] = crud.findAll
+  def findAll(): List[Task] = crud.findAll()
   def findPage: Int => Page[Task] = page => crud.findPage(page, orderBy = Some("title"))
   def findById: UUID => Option[Task] = uuid => crud.findById(uuid)
   def insert: Task => Option[Task] = task => crud.insert(task).map(s => task)

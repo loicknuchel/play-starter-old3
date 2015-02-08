@@ -1,6 +1,6 @@
 package common.models
 
-import play.api.libs.json.Json
+import play.api.libs.json._
 
 case class Page[A](items: Seq[A], currentPage: Int, pageSize: Int, totalItems: Long) {
   import java.math
@@ -9,5 +9,21 @@ case class Page[A](items: Seq[A], currentPage: Int, pageSize: Int, totalItems: L
   lazy val totalPages: Int = new java.math.BigDecimal(totalItems).divide(new math.BigDecimal(pageSize)).setScale(0, BigDecimal.RoundingMode.UP).toInt
 }
 object Page {
-  // TODO : implicit val format = Json.format[Page]
+  implicit def format[T: Format] = new Format[Page[T]] {
+    val tFormatter: Format[T] = implicitly[Format[T]]
+    def reads(js: JsValue): JsResult[Page[T]] = {
+      JsSuccess(Page[T](
+        (js \ "items").as[Seq[T]],
+        (js \ "currentPage").as[Int],
+        (js \ "pageSize").as[Int],
+        (js \ "totalItems").as[Long]))
+    }
+    def writes(p: Page[T]): JsValue = {
+      Json.obj(
+        "items" -> p.items,
+        "currentPage" -> p.currentPage,
+        "pageSize" -> p.pageSize,
+        "totalItems" -> p.totalItems)
+    }
+  }
 }
