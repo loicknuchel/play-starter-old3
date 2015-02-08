@@ -1,6 +1,6 @@
 package domain.models
 
-import domain.repository.UUID
+import common.models.UUID
 import play.api.data.Forms._
 import play.api.libs.json.Json
 

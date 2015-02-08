@@ -1,15 +1,16 @@
 package infrastructure.connection.sql
 
 import common.models.Page
+import common.models.UUID
+import common.models.MonadicResult
+import common.models.SyncResult
+import common.models.Repository
 import common.infrastructure.SqlCrudUtils
 import domain.models.Task
-import domain.repository.UUID
-import domain.repository.SyncResult
-import domain.repository.TaskRepository
 import anorm._
 import anorm.SqlParser._
 
-trait SqlTaskRepository extends TaskRepository[SyncResult] {
+trait SqlTaskRepository extends Repository[Task, MonadicResult] {
   private val tableName = "Tasks"
 
   private val rowParser = {
@@ -32,22 +33,10 @@ trait SqlTaskRepository extends TaskRepository[SyncResult] {
 
   private val crud = SqlCrudUtils(tableName, toValues, rowParser, "uuid")
 
-  /*
-  def findAll(): List[Task] = crud.findAll()
-  def findPage(page: Int = 1, filter: String = "%%", orderBy: Int = 1, pageSize: Int = 10): Page[Task] = crud.findPage(page, filter, orderBy, pageSize)
-  def findById(uid: String): Option[Task] = crud.findById(uid)
-  def findByIds(uids: Seq[String]): List[Task] = crud.findByIds(uids)
-  def findBy(fieldName: String, fieldValue: String): Option[Task] = crud.findBy(fieldName, fieldValue)
-  def findBy(fieldName: String, fieldValues: Seq[String]): List[Task] = crud.findBy(fieldName, fieldValues)
-  def insert(data: Task): Option[String] = crud.insert(data)
-  def update(uid: String, data: Task): Int = crud.update(uid, data)
-  def delete(uid: String): Int = crud.delete(uid)
-  */
-
-  def findAll(): List[Task] = crud.findAll()
-  def findPage: Int => Page[Task] = page => crud.findPage(page, orderBy = Some("title"))
-  def findById: UUID => Option[Task] = uuid => crud.findById(uuid)
-  def insert: Task => Option[Task] = task => crud.insert(task).map(s => task)
-  def update: (UUID, Task) => Option[Task] = (uuid, task) => { crud.update(uuid, task); Some(task) }
-  def delete: UUID => Option[Task] = uuid => { crud.delete(uuid); None; }
+  override def findAll(): MonadicResult[List[Task]] = SyncResult(crud.findAll())
+  override def findPage(page: Int): MonadicResult[Page[Task]] = SyncResult(crud.findPage(page, orderBy = Some("title")))
+  override def findByUuid(uuid: UUID): MonadicResult[Option[Task]] = SyncResult(crud.findById(uuid))
+  override def insert(elt: Task): MonadicResult[Option[Task]] = SyncResult(crud.insert(elt).map(s => elt))
+  override def update(uuid: UUID, elt: Task): MonadicResult[Option[Task]] = { crud.update(uuid, elt); SyncResult(Some(elt)) }
+  override def delete(uuid: UUID): MonadicResult[Option[Task]] = { crud.delete(uuid); SyncResult(None); }
 }
