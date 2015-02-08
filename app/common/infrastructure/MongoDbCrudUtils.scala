@@ -32,7 +32,7 @@ case class MongoDbCrudUtils[T](
 }
 object MongoDbCrudUtils {
   def findAll[T](collection: JSONCollection, filter: String = "", filterFields: List[String] = Nil, orderBy: String = "")(implicit r: Reads[T]): Future[List[T]] = {
-    val mongoFilterJson = BSONFormats.BSONDocumentFormat.writes(buildFilter(filter, filterFields)).as[JsObject]
+    val mongoFilterJson = buildFilter(filter, filterFields)
     val mongoOrder = buildOrder(orderBy)
 
     collection.find(mongoFilterJson).sort(mongoOrder).cursor[T].collect[List]()
@@ -42,10 +42,10 @@ object MongoDbCrudUtils {
     val realPage = if (page > 1) page - 1 else 0
     val offset = pageSize * realPage
 
-    val mongoFilter = buildFilter(filter, filterFields)
-    val mongoFilterJson = BSONFormats.BSONDocumentFormat.writes(mongoFilter).as[JsObject]
+    val mongoFilterJson = buildFilter(filter, filterFields)
+    val mongoFilter = BSONFormats.BSONDocumentFormat.reads(mongoFilterJson).get
     val mongoOrder = buildOrder(orderBy)
-    
+
     for (
       items <- collection.find(mongoFilterJson).options(QueryOpts(offset, pageSize)).sort(mongoOrder).cursor[T].collect[List](pageSize);
       totalItems <- collection.db.command(Count(collection.name, Some(mongoFilter)))
@@ -73,12 +73,8 @@ object MongoDbCrudUtils {
     collection.remove(Json.obj(fieldUuid -> uuid))
   }
 
-  private def buildFilter(filter: String, filterFields: List[String]): BSONDocument = {
-    // where : {"$or":[{"title":{"$regex":".*a.*"}},{"description":{"$regex":".*a.*"}}]}
-    BSONDocument("$or" -> filterFields.foldLeft(BSONArray()) {
-      case (doc, field) =>
-        doc.add(BSONDocument(field -> BSONDocument("$regex" -> (".*" + filter + ".*"))))
-    })
+  private def buildFilter(filter: String, filterFields: List[String]): JsObject = {
+    Json.obj("$or" -> filterFields.map(field => Json.obj(field -> Json.obj("$regex" -> (".*" + filter + ".*")))))
   }
 
   private def buildOrder(orderBy: String): JsObject = {
