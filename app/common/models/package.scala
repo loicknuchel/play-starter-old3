@@ -16,18 +16,18 @@ package object models {
     def get: Future[A]
     def getSync: A
     def map[B](f: (A) => B): MonadicResult[B]
-    def flatMap[B](f: (A) ⇒ MonadicResult[B]): MonadicResult[B]
+    def flatMap[B](f: (A) => MonadicResult[B]): MonadicResult[B]
   }
   case class SyncResult[A](a: A) extends MonadicResult[A] {
     def get: Future[A] = Future.successful(a)
     def getSync: A = a
     def map[B](f: (A) => B): SyncResult[B] = SyncResult(f(a))
-    def flatMap[B](f: (A) ⇒ MonadicResult[B]): MonadicResult[B] = f(a)
+    def flatMap[B](f: (A) => MonadicResult[B]): MonadicResult[B] = f(a)
   }
   case class AsyncResult[A](a: Future[A]) extends MonadicResult[A] {
     def get: Future[A] = a
     def getSync: A = Await.result(a, 3.seconds)
     def map[B](f: (A) => B): AsyncResult[B] = AsyncResult(a.map(f(_)))
-    def flatMap[B](f: (A) ⇒ MonadicResult[B]): MonadicResult[B] = AsyncResult(a.flatMap(u => f(u).get))
+    def flatMap[B](f: (A) => MonadicResult[B]): MonadicResult[B] = AsyncResult(a.flatMap(u => f(u).get))
   }
 }
