@@ -2,6 +2,7 @@ package controllers
 
 import common.models.Repository
 import common.models.MonadicResult
+import common.controllers.ApiCrudUtils
 import domain.models.Task
 import domain.models.TaskData
 import domain.repository.TaskRepository
@@ -18,7 +19,8 @@ object Tasks extends Controller {
   val viewCreate = views.html.Application.Task.create
   val viewDetails = views.html.Application.Task.details
   val viewEdit = views.html.Application.Task.edit
-  def toElt(data: TaskData): Task = TaskData.toModel(data)
+  def createElt(data: TaskData): Task = TaskData.toModel(data)
+  def updateElt(elt: Task, data: TaskData): Task = elt.withData(data)
   def toData(elt: Task): TaskData = TaskData.fromModel(elt)
   def validate(json: JsValue): JsResult[TaskData] = json.validate[TaskData]
   def successCreateFlash(elt: Task) = s"Task '${elt.title}' has been created"
@@ -47,7 +49,7 @@ object Tasks extends Controller {
   def save = Action.async { implicit req =>
     form.bindFromRequest.fold(
       formWithErrors => MonadicResult(BadRequest(viewCreate(formWithErrors))),
-      formData => repository.insert(toElt(formData)).map {
+      formData => repository.insert(createElt(formData)).map {
         _.map { elt =>
           Redirect(mainRoute.list()).flashing("success" -> successCreateFlash(elt))
         }.getOrElse(InternalServerError(viewCreate(form.fill(formData))).flashing("error" -> errorCreateFlash(formData)))
@@ -75,7 +77,7 @@ object Tasks extends Controller {
       _.map { elt =>
         form.bindFromRequest.fold(
           formWithErrors => MonadicResult(BadRequest(viewEdit(formWithErrors, elt))),
-          formData => repository.update(uuid, toElt(formData)).map {
+          formData => repository.update(uuid, updateElt(elt, formData)).map {
             _.map { updatedElt =>
               Redirect(mainRoute.list()).flashing("success" -> successUpdateFlash(updatedElt))
             }.getOrElse(InternalServerError(viewEdit(form.fill(formData), elt)).flashing("error" -> errorUpdateFlash(elt)))
@@ -93,53 +95,12 @@ object Tasks extends Controller {
     }.get
   }
 
-  def apiList(p: Int = 1, f: String = "", o: String = "") = Action.async {
-    repository.findPage(p, f, o).map { page =>
-      Ok(Json.toJson(page))
-    }.get
-  }
-  def apiListAll(f: String = "", o: String = "") = Action.async {
-    repository.findAll(f, o).map { all =>
-      Ok(Json.toJson(all))
-    }.get
-  }
-  def apiCreate = Action.async(parse.json) { req =>
-    validate(req.body).map { formData =>
-      repository.insert(toElt(formData)).map {
-        _.map { elt =>
-          Ok(Json.toJson(elt))
-        }.getOrElse(InternalServerError)
-      }.get
-    }.getOrElse(MonadicResult(BadRequest).get)
-  }
-  def apiDetails(uuid: String) = Action.async {
-    repository.findByUuid(uuid).map {
-      _.map { elt =>
-        Ok(Json.obj("item" -> elt))
-      }.getOrElse(NotFound)
-    }.get
-  }
-  def apiUpdate(uuid: String) = Action.async(parse.json) { req =>
-    repository.findByUuid(uuid).flatMap { u =>
-      val a: MonadicResult[Result] = u.map { elt =>
-        val b: MonadicResult[Result] = validate(req.body).map { formData =>
-          repository.update(uuid, toElt(formData)).map {
-            _.map { updatedElt =>
-              Ok(Json.obj("item" -> updatedElt))
-            }.getOrElse(InternalServerError)
-          }
-        }.getOrElse(MonadicResult(BadRequest))
-        b
-      }.getOrElse(MonadicResult(NotFound))
-      a
-    }.get
-  }
-  def apiDelete(uuid: String) = Action.async {
-    repository.findByUuid(uuid).map {
-      _.map { elt =>
-        repository.delete(uuid)
-        Ok
-      }.getOrElse(NotFound)
-    }.get
-  }
+  val crudApi = ApiCrudUtils(repository, Task.format, validate, createElt, updateElt)
+
+  def apiList = crudApi.list
+  def apiListAll = crudApi.listAll
+  def apiCreate = crudApi.create
+  def apiDetails = crudApi.details
+  def apiUpdate = crudApi.update
+  def apiDelete = crudApi.delete
 }

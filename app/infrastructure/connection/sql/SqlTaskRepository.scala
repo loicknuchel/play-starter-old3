@@ -36,7 +36,7 @@ trait SqlTaskRepository extends Repository[Task] {
   override def findAll(filter: String = "", orderBy: String = ""): MonadicResult[List[Task]] = SyncResult(crud.findAll(filter, orderBy))
   override def findPage(page: Int = 1, filter: String = "", orderBy: String = ""): MonadicResult[Page[Task]] = SyncResult(crud.findPage(page, filter, orderBy))
   override def findByUuid(uuid: UUID): MonadicResult[Option[Task]] = SyncResult(crud.findByUuid(uuid))
-  override def insert(elt: Task): MonadicResult[Option[Task]] = SyncResult({ val eltWithId = elt.withUuid(generateUuid()); crud.insert(eltWithId).map(s => eltWithId) })
+  override def insert(elt: Task): MonadicResult[Option[Task]] = SyncResult({ crud.insert(elt).map(s => elt) })
   override def update(uuid: UUID, elt: Task): MonadicResult[Option[Task]] = SyncResult({ crud.update(uuid, elt); Some(elt) })
   override def delete(uuid: UUID): MonadicResult[Option[Task]] = SyncResult({ crud.delete(uuid); None }) // TODO : return deleted elt !
 }
