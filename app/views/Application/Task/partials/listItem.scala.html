@@ -11,6 +11,6 @@
       <form class="form-button" method="POST" action="@routes.Tasks.delete(task.uuid)"><button type="submit" class="btn btn-danger">Supprimer</button></form>
     </div>
     <h4 class="media-heading">@task.title</h4>
-    <p>@task.description</p>
+    <p>@helpers.textMultiline(task.description)</p>
   </div>
 </div>

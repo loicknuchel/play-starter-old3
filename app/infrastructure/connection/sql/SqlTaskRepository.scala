@@ -7,6 +7,7 @@ import common.models.SyncResult
 import common.models.Repository
 import common.infrastructure.SqlCrudUtils
 import domain.models.Task
+import java.util.Date
 import anorm._
 import anorm.SqlParser._
 
@@ -17,9 +18,11 @@ trait SqlTaskRepository extends Repository[Task] {
     get[String](s"$tableName.uuid") ~
       get[String](s"$tableName.title") ~
       get[String](s"$tableName.description") ~
-      get[Boolean](s"$tableName.done") map {
-        case uuid ~ title ~ description ~ done =>
-          Task(uuid, title, description, done)
+      get[Boolean](s"$tableName.done") ~
+      get[Date](s"$tableName.created") ~
+      get[Date](s"$tableName.updated") map {
+        case uuid ~ title ~ description ~ done ~ created ~ updated =>
+          Task(uuid, title, description, done, created, updated)
       }
   }
 
@@ -28,7 +31,9 @@ trait SqlTaskRepository extends Repository[Task] {
       ("uuid", task.map(_.uuid)),
       ("title", task.map(_.title)),
       ("description", task.map(_.description)),
-      ("done", task.map(_.done)))
+      ("done", task.map(_.done)),
+      ("created", task.map(_.created)),
+      ("updated", task.map(_.updated)))
   }
 
   private val crud = SqlCrudUtils(tableName, toValues, rowParser, List("title", "description"), "uuid")

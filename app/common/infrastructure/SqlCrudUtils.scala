@@ -77,7 +77,9 @@ object SqlCrudUtils {
       val params = values.map(t => NamedParameter(t._1, t._2))
       val tableFields = fields.mkString(", ")
       val tableFieldsValues = fields.map(str => "{" + str + "}").mkString(", ")
-      SQL(s"insert into $tableName($tableFields) values ($tableFieldsValues)").on(params: _*).executeInsert().map(uuid => uuid.toString)
+      val generatedUuid = SQL(s"insert into $tableName($tableFields) values ($tableFieldsValues)").on(params: _*).executeInsert()
+      // TODO get uuid from values and return it if generatedUuid is None
+      generatedUuid.map(uuid => uuid.toString).orElse(Some(""))
     }
   }
 

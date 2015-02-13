@@ -4,8 +4,8 @@
 @(page: common.models.Page[_], link: Int => play.api.mvc.Call, range: Int = 2)
 
 <div>
-  @if(page.totalItems == 0){ <p>Aucun élément ne correspond à ces critères de recherche.</p> }
-  @if(page.totalItems == 1){ <p>Un seul élément correspond à ces critères de recherche.</p> }
+  @if(page.totalItems == 0){ <p>Aucun élément trouvé.</p> }
+  @if(page.totalItems == 1){ <p>Un seul élément trouvé.</p> }
   @if(page.totalItems >  1){ <p>@page.totalItems éléments trouvés</p> }
 
   @if(page.totalItems > page.pageSize) {

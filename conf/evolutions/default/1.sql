@@ -5,6 +5,8 @@ CREATE TABLE `Tasks` (
   `title` varchar(255) NOT NULL,
   `description` text NOT NULL,
   `done` boolean NOT NULL,
+  `created` datetime NOT NULL,
+  `updated` datetime NOT NULL,
   PRIMARY KEY (`uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
