@@ -1,20 +1,20 @@
 @(title: String)(content: Html)(implicit lang: Lang, flash: Flash, req: RequestHeader)
 
+@import helpers.Helpers._
+
 @main(if(title.length > 0) title+" | Play Starter" else "Play Starter") {
 <div class="container">
   <div class="masthead">
     <h3 class="text-muted">Play Starter</h3>
     <nav>
       <ul class="nav nav-justified">
-        <li @if(helpers.Helpers.isActive(routes.Application.home())){class="active"}><a href="@routes.Application.home()">Home</a></li>
-        <li @if(helpers.Helpers.hasBaseUrl(routes.Tasks.list())){class="active"}><a href="@routes.Tasks.list()">Tasks</a></li>
-        <li><a href="#">Services</a></li>
-        <li><a href="#">Downloads</a></li>
-        <li><a href="#">About</a></li>
-        <li><a href="#">Contact</a></li>
+        <li @if(isActive(routes.Application.home())){class="active"}><a href="@routes.Application.home()">Home</a></li>
+        <li @if(hasBaseUrl(routes.Tasks.list())){class="active"}><a href="@routes.Tasks.list()">Tasks</a></li>
+        <li @if(hasBaseUrl(admin.routes.Admin.home())){class="active"}><a href="@admin.routes.Admin.home()">Admin</a></li>
       </ul>
     </nav>
   </div>
+  @helpers.flash()
   @content
   <!-- Site footer -->
   <footer class="footer">

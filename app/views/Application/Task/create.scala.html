@@ -2,7 +2,6 @@
 
 @template("Create task") {
   <div>
-    @helpers.flash()
     <h1>Create task</h1>
     <form class="form-horizontal" method="POST" action="@routes.Tasks.save()">
       @partials.form(taskForm)

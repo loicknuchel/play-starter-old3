@@ -14,6 +14,10 @@ GET       /tasks/:uuid/edit     controllers.Tasks.edit(uuid: String)
 POST      /tasks/:uuid          controllers.Tasks.update(uuid: String)
 POST      /tasks/:uuid/delete   controllers.Tasks.delete(uuid: String)
 
+GET       /admin                controllers.admin.Admin.home
+GET       /admin/users          controllers.admin.Users.list(p: Int ?= 1, f: String ?= "", o: String ?= "")
+GET       /admin/accessLevels   controllers.admin.AccessLevels.list(p: Int ?= 1, f: String ?= "", o: String ?= "")
+
 GET       /api/v1/tasks         controllers.Tasks.apiList(p: Int ?= 1, f: String ?= "", o: String ?= "")
 GET       /api/v1/tasks/all     controllers.Tasks.apiListAll(f: String ?= "", o: String ?= "")
 POST      /api/v1/tasks         controllers.Tasks.apiCreate

@@ -1,0 +1,17 @@
+@(title: String)(content: Html)(implicit lang: Lang, flash: Flash, req: RequestHeader)
+
+@import helpers.Helpers._
+
+@template(title) {
+  <div class="row">
+    <div class="col-md-4">
+      <div class="list-group">
+        <a class="list-group-item @if(hasBaseUrl(admin.routes.Users.list())){active}" href="@admin.routes.Users.list()">Users</a>
+        <a class="list-group-item @if(hasBaseUrl(admin.routes.AccessLevels.list())){active}" href="@admin.routes.AccessLevels.list()">Access levels</a>
+      </div>
+    </div>
+    <div class="col-md-8">
+      @content
+    </div>    
+  </div>
+}

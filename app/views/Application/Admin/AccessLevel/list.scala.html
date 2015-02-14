@@ -1,0 +1,18 @@
+@()(implicit lang: Lang, flash: Flash, req: RequestHeader)
+
+@import views.html.Application.Admin._
+
+@adminTemplate("Users") {
+  <h1>
+    <a class="btn btn-default pull-right" href="#"><i class="fa fa-plus"></i> Créer</a>
+    0 access level
+  </h1>
+  <form class="form-search" method="GET" action="">
+    <input type="hidden" name="p" value="">
+    <input type="hidden" name="o" value="@req.getQueryString("o")">
+    <div class="form-group has-feedback">
+      <input type="text" class="form-control" name="f" placeholder="Search ..." value="@req.getQueryString("f")">
+      <span class="glyphicon glyphicon-search form-control-feedback" aria-hidden="true"></span>
+    </div>
+  </form>
+}

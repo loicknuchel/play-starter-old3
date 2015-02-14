@@ -2,7 +2,6 @@
 
 @template("Edit task "+task.title) {
   <div>
-    @helpers.flash()
     <h1>Edit task</h1>
     <form class="form-horizontal" method="POST" action="@routes.Tasks.update(task.uuid)">
       @partials.form(taskForm)
