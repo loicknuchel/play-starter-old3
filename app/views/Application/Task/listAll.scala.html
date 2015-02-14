@@ -5,6 +5,13 @@
     @helpers.flash()
     <a class="btn btn-default pull-right" href="@routes.Tasks.create()"><i class="fa fa-plus"></i> Créer</a>
     <h1>@tasks.length task@if(tasks.length > 1) {s}</h1>
+    <form class="form-search" method="GET" action="@routes.Tasks.listAll()">
+      <input type="hidden" name="o" value="@req.getQueryString("o")">
+      <div class="form-group has-feedback">
+        <input type="text" class="form-control" name="f" placeholder="Search ..." value="@req.getQueryString("f")">
+        <span class="glyphicon glyphicon-search form-control-feedback" aria-hidden="true"></span>
+      </div>
+    </form>
     @tasks.map { task =>
       @partials.listItem(task)
     }

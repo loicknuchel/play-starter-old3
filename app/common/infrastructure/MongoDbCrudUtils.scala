@@ -74,7 +74,7 @@ object MongoDbCrudUtils {
   }
 
   private def buildFilter(filter: String, filterFields: List[String]): JsObject = {
-    Json.obj("$or" -> filterFields.map(field => Json.obj(field -> Json.obj("$regex" -> (".*" + filter + ".*")))))
+    Json.obj("$or" -> filterFields.map(field => Json.obj(field -> Json.obj("$regex" -> (".*" + filter + ".*"), "$options" -> "i"))))
   }
 
   private def buildOrder(orderBy: String): JsObject = {

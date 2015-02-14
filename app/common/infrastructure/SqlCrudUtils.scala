@@ -29,7 +29,7 @@ object SqlCrudUtils {
       val realFilter = if (filter.length() == 0) "%%" else "%" + filter + "%"
       val sqlFilter = buildFilter(filterFields)
       val sqlOrder = buildOrder(orderBy)
-      SQL(s"select * from $tableName $sqlFilter $sqlOrder").as(rowParser *)
+      SQL(s"select * from $tableName $sqlFilter $sqlOrder").on('filter -> realFilter).as(rowParser *)
     }
   }
 
