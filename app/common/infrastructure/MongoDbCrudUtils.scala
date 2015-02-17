@@ -13,6 +13,11 @@ import reactivemongo.core.commands.Count
 import reactivemongo.bson.BSONDocument
 import reactivemongo.bson.BSONArray
 
+/*
+ * Convention :
+ *  - methods get* return one result (Option[T])
+ *  - methods find* return a list of results (List[T])
+ */
 case class MongoDbCrudUtils[T](
   collection: JSONCollection,
   format: Format[T],
@@ -22,9 +27,10 @@ case class MongoDbCrudUtils[T](
   implicit val w: Writes[T] = format
   def findAll(filter: String = "", orderBy: String = ""): Future[List[T]] = MongoDbCrudUtils.findAll(collection, filter, filterFields, orderBy)
   def findPage(page: Int = 1, filter: String = "", orderBy: String = "", pageSize: Int = Defaults.pageSize): Future[Page[T]] = MongoDbCrudUtils.findPage(collection, page, filter, filterFields, orderBy, pageSize)
-  def findByUuid(uuid: String): Future[Option[T]] = MongoDbCrudUtils.findBy(uuid, collection, fieldUuid)
+  def findBy(fieldName: String, fieldValue: String): Future[List[T]] = MongoDbCrudUtils.findBy(fieldValue, collection, fieldName)
+  def getByUuid(uuid: String): Future[Option[T]] = MongoDbCrudUtils.getBy(uuid, collection, fieldUuid)
   def findByUuids(uuids: Seq[String]): Future[List[T]] = MongoDbCrudUtils.findByList(uuids, collection, fieldUuid)
-  def findBy(fieldName: String, fieldValue: String): Future[Option[T]] = MongoDbCrudUtils.findBy(fieldValue, collection, fieldName)
+  def getBy(fieldName: String, fieldValue: String): Future[Option[T]] = MongoDbCrudUtils.getBy(fieldValue, collection, fieldName)
   def findBy(fieldName: String, fieldValues: Seq[String]): Future[List[T]] = MongoDbCrudUtils.findByList(fieldValues, collection, fieldName)
   def insert(elt: T): Future[LastError] = MongoDbCrudUtils.insert(elt, collection)
   def update(uuid: String, elt: T): Future[LastError] = MongoDbCrudUtils.update(uuid, elt, collection, fieldUuid)
@@ -52,7 +58,11 @@ object MongoDbCrudUtils {
     ) yield Page(items, realPage + 1, pageSize, totalItems)
   }
 
-  def findBy[T](uuid: String, collection: JSONCollection, fieldUuid: String = "uuid")(implicit r: Reads[T]): Future[Option[T]] = {
+  def findBy[T](value: String, collection: JSONCollection, fieldName: String = "uuid")(implicit r: Reads[T]): Future[List[T]] = {
+    collection.find(Json.obj(fieldName -> value)).cursor[T].collect[List]()
+  }
+
+  def getBy[T](uuid: String, collection: JSONCollection, fieldUuid: String = "uuid")(implicit r: Reads[T]): Future[Option[T]] = {
     collection.find(Json.obj(fieldUuid -> uuid)).one[T]
   }
 

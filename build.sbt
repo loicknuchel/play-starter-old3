@@ -20,8 +20,9 @@ libraryDependencies ++= Seq(
   cache,
   ws,
   "org.ocpsoft.prettytime" % "prettytime" % "3.2.4.Final",
+  "org.scalaz" %% "scalaz-core" % "7.1.0",
+  "org.scalaz" %% "scalaz-effect" % "7.1.0",
   "mysql" % "mysql-connector-java" % "5.1.30",
   "org.reactivemongo" %% "play2-reactivemongo" % "0.10.5.0.akka23",
-  "org.scalaz" %% "scalaz-core" % "7.1.0",
-  "org.scalaz" %% "scalaz-effect" % "7.1.0"
+  "com.mohiva" %% "play-silhouette" % "1.0"
 ) ++ testDeps

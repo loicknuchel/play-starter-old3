@@ -57,7 +57,7 @@ object Tasks extends Controller {
   }
 
   def details(uuid: String) = Action.async { implicit req =>
-    repository.findByUuid(uuid).map {
+    repository.getByUuid(uuid).map {
       _.map { elt =>
         Ok(viewDetails(elt))
       }.getOrElse(NotFound(views.html.error404()))
@@ -65,7 +65,7 @@ object Tasks extends Controller {
   }
 
   def edit(uuid: String) = Action.async { implicit req =>
-    repository.findByUuid(uuid).map {
+    repository.getByUuid(uuid).map {
       _.map { elt =>
         Ok(viewEdit(form.fill(toData(elt)), elt))
       }.getOrElse(NotFound(views.html.error404()))
@@ -73,7 +73,7 @@ object Tasks extends Controller {
   }
 
   def update(uuid: String) = Action.async { implicit req =>
-    repository.findByUuid(uuid).flatMap {
+    repository.getByUuid(uuid).flatMap {
       _.map { elt =>
         form.bindFromRequest.fold(
           formWithErrors => MonadicResult(BadRequest(viewEdit(formWithErrors, elt))),
@@ -87,7 +87,7 @@ object Tasks extends Controller {
   }
 
   def delete(uuid: String) = Action.async { implicit req =>
-    repository.findByUuid(uuid).map {
+    repository.getByUuid(uuid).map {
       _.map { elt =>
         repository.delete(uuid)
         Redirect(mainRoute.list()).flashing("success" -> successDeleteFlash(elt))

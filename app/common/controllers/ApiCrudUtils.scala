@@ -49,7 +49,7 @@ object ApiCrudUtils {
   }
 
   def details[T](repository: Repository[T])(uuid: String)(implicit w: Writes[T]) = Action.async {
-    repository.findByUuid(uuid).map {
+    repository.getByUuid(uuid).map {
       _.map { elt =>
         Results.Ok(Json.obj("item" -> elt))
       }.getOrElse(Results.NotFound)
@@ -57,7 +57,7 @@ object ApiCrudUtils {
   }
 
   def update[T, TData](repository: Repository[T], validate: JsValue => JsResult[TData], updateElt: (T, TData) => T)(uuid: String)(implicit w: Writes[T]) = Action.async(parse.json) { req =>
-    repository.findByUuid(uuid).flatMap { u =>
+    repository.getByUuid(uuid).flatMap { u =>
       val a: MonadicResult[Result] = u.map { elt =>
         val b: MonadicResult[Result] = validate(req.body).map { formData =>
           repository.update(uuid, updateElt(elt, formData)).map {
@@ -73,7 +73,7 @@ object ApiCrudUtils {
   }
 
   def delete[T](repository: Repository[T])(uuid: String) = Action.async {
-    repository.findByUuid(uuid).map {
+    repository.getByUuid(uuid).map {
       _.map { elt =>
         repository.delete(uuid)
         Results.Ok

@@ -20,7 +20,7 @@ trait MongoDbTaskRepository extends Repository[Task] with Connection {
 
   override def findAll(filter: String = "", orderBy: String = ""): MonadicResult[List[Task]] = AsyncResult(crud.findAll(filter, orderBy))
   override def findPage(page: Int = 1, filter: String = "", orderBy: String = ""): MonadicResult[Page[Task]] = AsyncResult(crud.findPage(page, filter, orderBy))
-  override def findByUuid(uuid: UUID): MonadicResult[Option[Task]] = AsyncResult(crud.findByUuid(uuid))
+  override def getByUuid(uuid: UUID): MonadicResult[Option[Task]] = AsyncResult(crud.getByUuid(uuid))
   override def insert(elt: Task): MonadicResult[Option[Task]] = AsyncResult({ crud.insert(elt).map(err => if (err.ok) Some(elt) else None) })
   override def update(uuid: UUID, elt: Task): MonadicResult[Option[Task]] = AsyncResult(crud.update(uuid, elt).map(err => if (err.ok) Some(elt) else None))
   override def delete(uuid: UUID): MonadicResult[Option[Task]] = AsyncResult(crud.delete(uuid).map(err => None)) // TODO : return deleted elt !

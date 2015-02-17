@@ -7,6 +7,11 @@ import anorm._
 import anorm.SqlParser._
 import common.Defaults
 
+/*
+ * Convention :
+ *  - methods get* return one result (Option[T])
+ *  - methods find* return a list of results (List[T])
+ */
 case class SqlCrudUtils[T](
   tableName: String,
   toValues: Option[T] => List[(String, ParameterValue)],
@@ -15,9 +20,10 @@ case class SqlCrudUtils[T](
   fieldUuid: String = "uuid") {
   def findAll(filter: String = "", orderBy: String = ""): List[T] = SqlCrudUtils.findAll(tableName, rowParser, filter, filterFields, orderBy)
   def findPage(page: Int = 1, filter: String = "", orderBy: String = "", pageSize: Int = Defaults.pageSize): Page[T] = SqlCrudUtils.findPage(tableName, rowParser, page, filter, filterFields, orderBy, pageSize)
-  def findByUuid(uuid: String): Option[T] = SqlCrudUtils.findBy(uuid, tableName, rowParser, fieldUuid)
+  def findBy(fieldName: String, fieldValue: String): List[T] = SqlCrudUtils.findBy(fieldValue, tableName, rowParser, fieldName)
+  def getByUuid(uuid: String): Option[T] = SqlCrudUtils.getBy(uuid, tableName, rowParser, fieldUuid)
   def findByUuids(uuids: Seq[String]): List[T] = SqlCrudUtils.findByList(uuids, tableName, rowParser, fieldUuid)
-  def findBy(fieldName: String, fieldValue: String): Option[T] = SqlCrudUtils.findBy(fieldValue, tableName, rowParser, fieldName)
+  def getBy(fieldName: String, fieldValue: String): Option[T] = SqlCrudUtils.getBy(fieldValue, tableName, rowParser, fieldName)
   def findBy(fieldName: String, fieldValues: Seq[String]): List[T] = SqlCrudUtils.findByList(fieldValues, tableName, rowParser, fieldName)
   def insert(data: T): Option[String] = SqlCrudUtils.insert(toValues(Some(data)), tableName)
   def update(uuid: String, data: T): Int = SqlCrudUtils.update(uuid, toValues(Some(data)), tableName, fieldUuid)
@@ -50,9 +56,15 @@ object SqlCrudUtils {
     }
   }
 
-  def findBy[T](uuid: String, tableName: String, rowParser: RowParser[T], fieldUuid: String = "uuid"): Option[T] = {
+  def getBy[T](uuid: String, tableName: String, rowParser: RowParser[T], fieldUuid: String = "uuid"): Option[T] = {
     DB.withConnection { implicit connection =>
       SQL(s"select * from $tableName where $fieldUuid={uuid}").on('uuid -> uuid).as(rowParser.singleOpt)
+    }
+  }
+
+  def findBy[T](value: String, tableName: String, rowParser: RowParser[T], fieldName: String = "uuid"): List[T] = {
+    DB.withConnection { implicit connection =>
+      SQL(s"select * from $tableName where $fieldName={value}").on('value -> value).as(rowParser *)
     }
   }
 
