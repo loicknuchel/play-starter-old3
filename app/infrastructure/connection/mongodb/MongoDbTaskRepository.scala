@@ -8,13 +8,16 @@ import common.models.Repository
 import domain.models.Task
 import common.infrastructure.MongoDbCrudUtils
 import scala.concurrent.Future
+import play.api.Play.current
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.Json
 import reactivemongo.api.DB
 import play.modules.reactivemongo.json.collection.JSONCollection
+import play.modules.reactivemongo.ReactiveMongoPlugin
 
-trait MongoDbTaskRepository extends Repository[Task] with Connection {
-  override lazy val collection: JSONCollection = db[JSONCollection](CollectionReferences.TASKS)
+trait MongoDbTaskRepository extends Repository[Task] {
+  val db = ReactiveMongoPlugin.db
+  lazy val collection: JSONCollection = db[JSONCollection](CollectionReferences.TASKS)
 
   private val crud = MongoDbCrudUtils(collection, Task.format, List("title", "description"), "uuid")
 
