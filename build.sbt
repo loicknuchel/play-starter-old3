@@ -19,7 +19,6 @@ libraryDependencies ++= Seq(
   anorm,
   cache,
   ws,
-  "org.ocpsoft.prettytime" % "prettytime" % "3.2.4.Final",
   "org.scalaz" %% "scalaz-core" % "7.1.0",
   "org.scalaz" %% "scalaz-effect" % "7.1.0",
   "mysql" % "mysql-connector-java" % "5.1.30",

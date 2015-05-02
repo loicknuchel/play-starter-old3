@@ -20,6 +20,7 @@ object Task {
   implicit val format = Json.format[Task]
 }
 
+// mapping object for Task Form
 case class TaskData(
   title: String,
   description: String,
